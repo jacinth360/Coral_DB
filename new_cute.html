@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoralDB</title>
+    <style>
+        /* Reset default margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS for tabs */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('/Users/wangmux/Desktop/Untitled Project (1).jpg');
+            background-size: cover;
+            background-color: #0b4a6a; /* Slightly darker shade of blue for underwater feel */
+            color: #2109a8; /* Light gray text color */
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.31); /* Shadow effect with white */
+            padding: 20px;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        .tab button {
+            background-color: #0277a8; /* Darker shade of blue for tab buttons */
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+            border-radius: 8px 8px 0 0;
+            color: #ffffff; /* White text */
+        }
+
+        .tab button:hover {
+            background-color: #036b8a; /* Darker shade of blue on hover */
+        }
+
+        .tab button.active {
+            background-color: #024959; /* Deep blue for active tab */
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: rgba(168, 216, 233, 0.5); /* Light blue for tab content background */
+            color: #024959; /* Deep blue for text */
+        }
+
+        .tabcontent.active {
+            display: block;
+        }
+
+        .banner {
+            background-color: #024959; /* Deep blue for banner */
+            color: #ffffff; /* White text */
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 4px solid #0574a0; /* Darker blue border */
+        }
+
+        .banner h1 {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Updated font */
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #ffffff; /* White text */
+            font-weight: bold;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Updated font */
+        }
+
+        nav ul li a:hover {
+            color: #a8d8e9; /* Light blue on hover */
+        }
+
+        .query-form label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ffffff; /* White text for labels */
+            font-weight: bold;
+        }
+
+        .query-form select,
+        .query-form input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style for metadata selection */
+        #metadata {
+            padding: 20px;
+            background-color: rgba(168, 216, 233, 0.5); /* Light blue for metadata background */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        #taxonomySelect {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #selectedTaxonomy {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Style for paragraphs */
+        p {
+            margin-top: 0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #ffffff; /* White text for paragraphs */
+        }
+
+        /* style for tables */
+        table {
+            border: medium solid #6495ed;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px; /* Add some space below tables */
+        }
+
+        th {
+            border: thin solid #6495ed;
+            padding: 5px;
+            background-color: #024959; /* Deep blue for table headers */
+            color: #ffffff; /* White text */
+            text-align: left;
+        }
+
+        td {
+            border: thin solid #6495ed;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .odd {
+            background: #e8edff;
+        }
+
+        img {
+            padding: 5px;
+            border: solid;
+            border-color: #dddddd #aaaaaa #aaaaaa #dddddd;
+            border-width: 1px 2px 2px 1px;
+            background-color: #ffffff; /* White background for images */
+            max-width: 50%; /* Maximum width of the image is 100% of its container */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Remove any default inline styling */
+            margin: auto; /* Center the image horizontally */
+        }
+    </style>
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="banner">
+        <h1>CoralDB</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#data">Data</a></li>
+                <li><a href="#metadata">Metadata</a></li>
+                <li><a href="#photo">Photo</a></li>
+                <li><a href="#Colors">Colors</a></li>
+                <li><a href="#help">Help</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="home" class="tabcontent active">
+        <h2>Home</h2>
+        <p>The Coral DB aims to create a comprehensive database to track the demographic, phenotypic, and ecological variation of coral populations across multiple habitats within the Turneffe Atoll Marine Reserve, Belize. The project focuses on three generalist coral species: Finger Coral (Porites porites), Mustard Hill Coral (P. astreoides), and Massive Starlet Coral (Siderastrea siderea). By integrating data on habitat type, geographic coordinates, phenotypic traits, genetic information, and associated microorganisms, Coral DB will facilitate longitudinal studies to understand how corals respond to anthropogenic environmental impacts.</p>
+        <p>With respect to habitat type, the Turneffe Atoll consists of a mangrove forest called Crooked Creek and a reef called Patch Reef. These will allow researchers to compare the hardiness of corals inhabiting mangrove roots versus the open ocean. In addition to phenotypic data, we also track the metagenomic data of each coral. The bacteria, archaeal species colonizing the coral polyps, as well as the species of eukaryotic algae that form a symbiotic relationship with them, will be vital to informing scientists about how corals can resist climate and environmental change.</p>
+
+        <!-- Additional information -->
+        <p>This project was developed at Boston University as part of BF768, Spring 2024.</p>
+
+        <!-- Bottom section for student developers and project advisor -->
+        <div class="developers">
+            <h3>Student Developers:</h3>
+            </p><li>Truman Fogler</li>
+            <li>Jacinth Angelina</li>
+            <li>Muxi Wang</li>
+            <p>
+            <!-- Space added here -->
+            <h3>Project Advisor:</h3>
+            <p>Dr. John R. Finnerty</p>
+            <h3>Instructor:</h3>
+            <p>G. Benson</p>
+        </div>
+    </div>
+
+    <div id="data" class="tabcontent">
+        <h2>Data</h2>
+        <p>Only 16S and ITS2 data are available at the moment. Please select the location and species and press the query button. To export the data, press the download data button.</p>
+        <!-- Add options for different data views if needed -->
+        <form id="16SForm" class="query-form" action="cgi-bin/query_data.py" method="post">
+            <h2>Query 16S Data</h2>
+            <label for="location_16s">Location:</label>
+            <select id="location_16s" name="location_16s">
+                <option value="" selected>Select Location</option>
+                <option value="Crook">Crook</option>
+                <option value="Reef">Reef</option>
+                <option value="Lagoon">Lagoon</option>
+            </select>
+            <br>
+            <label for="species_16s">Species:</label>
+            <select id="species_16s" name="species_16s">
+                <option value="" selected>Select Species</option>
+                <option value="PAST">PAST</option>
+                <option value="SSID">SSID</option>
+            </select>
+            <br>
+            <input type="hidden" name="table" value="16s">
+            <input type="submit" value="Query 16S Data">
+        </form>
+        <form id="ITS2Form" class="query-form" action="cgi-bin/query_data.py" method="post">
+            <h2>Query ITS2 Data</h2>
+            <label for="location_its2">Location:</label>
+            <select id="location_its2" name="location_its2">
+                <option value="" selected>Select Location</option>
+                <option value="Crook">Crook</option>
+                <option value="Reef">Reef</option>
+                <option value="Lagoon">Lagoon</option>
+            </select>
+            <br>
+            <label for="species_its2">Species:</label>
+            <select id="species_its2" name="species_its2">
+                <option value="" selected>Select Species</option>
+                <option value="PAST">PAST</option>
+                <option value="SSID">SSID</option>
+            </select>
+            <br>
+            <input type="hidden" name="table" value="its2">
+            <input type="submit" value="Query ITS2 Data">
+        </form>
+
+        <table>
+            <tr>
+                <th>Individual</th>
+                <th>location</th>
+                <th>species</th>
+                <th>color</th>
+                <th>mapslink</th>
+            </tr>
+            <tr class="odd">
+                <td>C_PAST_3</td>
+                <td>Crook</td>
+                <td>PAST</td>
+                <td>#39261B</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+            <tr>
+                <td>C_PAST_4</td>
+                <td>Crook</td>
+                <td>PAST</td>
+                <td>#463727</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+            <tr class="odd">
+                <td>C_PAST_5</td>
+                <td>Crook</td>
+                <td>PAST</td>
+                <td>#452922</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+            <tr>
+                <td>R_PAST_1</td>
+                <td>Reef</td>
+                <td>PAST</td>
+                <td>#90773D</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+            <tr class="odd">
+                <td>R_PAST_2</td>
+                <td>Reef</td>
+                <td>PAST</td>
+                <td>#978B47</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+            <tr>
+                <td>R_PAST_4</td>
+                <td>Reef</td>
+                <td>PAST</td>
+                <td>#B69353</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+            <tr class="odd">
+                <td>R_PAST_5</td>
+                <td>Reef</td>
+                <td>PAST</td>
+                <td>#957D3B</td>
+                <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
+            </tr>
+        </table>
+
+        <h2>Download Data on display</h2>
+        <!-- Download button -->
+        <button id="downloadData">Download Data</button>
+    </div>
+
+    <div id="metadata" class="tabcontent">
+        <h2>Metadata</h2>
+        <p>Please select the taxonomy level you want to explore from the menu.</p>
+        <!-- Add your metadata content here -->
+
+        <!-- Taxonomy selection menu -->
+        <label for="taxonomySelect">Select Taxonomy Level:</label>
+        <select id="taxonomySelect">
+            <option value="">Select Taxonomy Level</option>
+            <option value="Kingdom">Kingdom</option>
+            <option value="Phylum">Phylum</option>
+            <option value="Class">Class</option>
+            <option value="Order">Order</option>
+            <option value="Family">Family</option>
+            <option value="Genus">Genus</option>
+            <option value="Species">Species</option>
+        </select>
+
+        <!-- Placeholder for displaying selected taxonomy value -->
+        <div id="selectedTaxonomy">
+            <img src="/Users/wangmux/Desktop/Screen Shot 2024-04-30 at 1.14.09 PM.png" alt="Example Taxonomy">
+        </div>
+    </div>
+
+    <div id="photo" class="tabcontent">
+        <h2>Photo</h2>
+        <p>Please select the location and species you want to explore and press the query photo data button.</p>
+        <!-- Dropdown menus for species and location -->
+        <form id="photoQueryForm" class="query-form" action="cgi-bin/query_photo_data.py" method="post">
+            <h2>Query Photo Data</h2>
+            <label for="location_photo">Location:</label>
+            <select id="location_photo" name="location_photo">
+                <option value="" selected>Select Location</option>
+                <option value="Crook">Crook</option>
+                <option value="Reef">Reef</option>
+                <option value="Lagoon">Lagoon</option>
+            </select>
+            <br>
+            <label for="species_photo">Species:</label>
+            <select id="species_photo" name="species_photo">
+                <option value="" selected>Select Species</option>
+                <option value="PAST">PAST</option>
+                <option value="SSID">SSID</option>
+            </select>
+            <br>
+            <input type="hidden" name="table" value="photo">
+            <input type="submit" value="Query Photo Data">
+        </form>
+        
+        <!-- Section for displaying photos of corals -->
+        <div id="coralPhotos">
+            <img src="/Users/wangmux/Downloads/2018_NativeGE_CrookedCreek_PAST_1 (1).jpg" alt="Example photo">
+        </div>
+
+    </div>
+
+    <div id="Colors" class="tabcontent">
+        <h2>Colors</h2>
+	<p>Please select the location and species you want to explore and press the query color data button.</p>
+        <!-- Dropdown menus for species and location -->
+        <form id="colorQueryForm" class="query-form" action="cgi-bin/query_color_data.py" method="post">
+            <h2>Query Color Data</h2>
+            <label for="location_color">Location:</label>
+            <select id="location_color" name="location_color">
+                <option value="" selected>Select Location</option>
+                <option value="Crook">Crook</option>
+                <option value="Reef">Reef</option>
+                <option value="Lagoon">Lagoon</option>
+            </select>
+            <br>
+            <label for="species_color">Species:</label>
+            <select id="species_color" name="species_color">
+                <option value="" selected>Select Species</option>
+                <option value="PAST">PAST</option>
+                <option value="SSID">SSID</option>
+            </select>
+            <br>
+            <input type="hidden" name="table" value="color">
+            <input type="submit" value="Query Color Data">
+        </form>
+        <div id="coralColors">
+            <img src="/Users/wangmux/Downloads/Screen Shot 2024-04-28 at 5.04.18 PM.png" alt="Example Colors">
+        </div>
+        <!-- Section for generating histogram -->
+        <div id="histogram">
+            <h3>Histogram of RGB Colors</h3>
+            <div id="histogramChart">
+                <!-- Google Charts histogram will be displayed here -->
+            </div>
+            <!-- Download button for exporting histogram as an image -->
+            <button id="exportHistogram">Export Histogram</button>
+        </div>
+    </div>
+
+    <div id="help" class="tabcontent">
+        <h2>Help</h2>
+        <p>Common questions and answers:</p>
+        <h3> How do I use the data tab? <h3>
+        <p> Under sections of "query X data", select your target location and species you want to explore and press "query X data", then a table would appear for you, when the table is on display, clicking on "Download Data" button will download the corresponding data and export into a csv file.<p>
+        <h3>How do I use the metadata tab? <h3>
+       <p> After selecting taxonomy level from the dropdown menu, a histogram would appear displaying the relative abundance vs the selected taxonomy level.  <p> 
+        <h3> How do I use the photo tab? <h3>
+        <p>Choose species and location of the coral you want to explore. After clicking on the "Query Photo Data botton", a photo of your selection will appear.</p>
+        <h3> How do I use the color tab?<h3>
+         <p> After selecting species and location and pressing the "query color" button, a histogram of RGB values would appear for analysis. You can also download this into an image by pressing "Export Histogram" button.</p>
+       
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            // Handle tab click event
+            $('nav ul li a').click(function(e){
+                e.preventDefault(); // Prevent default behavior of link
+                var tabId = $(this).attr('href'); // Get ID of the clicked tab
+                $('.tabcontent').removeClass('active'); // Hide all tab contents
+                $(tabId).addClass('active'); // Show the clicked tab content
+            });
+        });
+
+        // JavaScript to handle taxonomy selection
+        document.getElementById("taxonomySelect").addEventListener("change", function() {
+            var selectedValue = this.value;
+            var placeholder = document.getElementById("selectedTaxonomy");
+
+            if (selectedValue !== "") {
+                placeholder.textContent = "Selected Taxonomy Level: " + selectedValue;
+            } else {
+                placeholder.textContent = ""; // Clear placeholder if no option selected
+            }
+        });
+    </script>
+</body>
+</html>
