@@ -460,7 +460,9 @@
 
             // Handler for "Query 16S data" button click
             $("#find-miRNAs-button").click(function () {
-                var sequence = $("#query_16s_data").val().trim().toUpperCase();
+                var location = $("#location_16s").val();
+                var species = $("#species_16s").val();
+                // var sequence = $("#query_16s_data").val().trim().toUpperCase();
 
                 // Validate input (you can customize this validation)
                 
@@ -473,8 +475,8 @@
                     url: "https://bioed.bu.edu/cgi-bin/students_24/tfogler/Enter_query_tfogler.py",
                     method: "POST",
                     data: {
-                        data: sequence,
-                        selector: "seq"
+                        location: location,
+                        species: species
                     },
                     success: function (data) {
                         if (data.length === 0) {
@@ -483,6 +485,7 @@
                             // Format data for table (you'll need to adapt this part)
                             // Display the new table
                             // Example: displayTable(data);
+                            processData(data);
                         }
                     },
                     error: function () {
@@ -491,6 +494,39 @@
                 });
             });
         });
+
+        // Function to process 16S data table
+        function processData(data) {
+            var tableHtml = `<table>
+            <thead>
+                <tr>
+                    <th>Individual</th>
+                    <th>location</th>
+                    <th>species</th>
+                    <th>color</th>
+                    <th>mapslink</th>
+                </tr>
+            </thead>
+            <tbody>`;
+            // tableHtml = "<table><thead><tr><th>miRNA</th><th>Sequence</th></tr></thead><tbody>";
+
+            // Parse the JSON data
+            const parsedData = JSON.parse(data);
+
+            // Iterate through each row in the data
+            parsedData.forEach(function(row) {
+                tableHtml += `
+                <tr>
+                    <td>` + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td><td>" + row[4] + "</td><td>" + row[5] + `</td>
+                </tr>`;
+            });
+
+            tableHtml += `  </tbody>
+            </table>`;
+
+            // Insert the table into the specified resultDiv
+            $(".16s_data_table").html(tableHtml);
+        }
 
         // JavaScript to handle taxonomy selection
         document.getElementById("taxonomySelect").addEventListener("change", function() {
