@@ -40,7 +40,7 @@ print("Content-type: text/html\n")
 # species = sys.argv[2]
 form = cgi.FieldStorage()
 
-
+location, species = form.getvalue('location', ''), form.getvalue('species', '')
 filters = {'location': location, 'species': species}
 
 # define query2
@@ -48,12 +48,12 @@ filters = {'location': location, 'species': species}
 query2 = """
 SELECT c.cid, Individual, location, species, color, mapslink 
 FROM Coral c join Observation o on c.cid = o.cid
-WHERE location LIKE %s AND species LIKE %s;
+WHERE location LIKE %(location)s AND species LIKE %(species)s;
 """
 
 # execute the query
 try:
-    cursor.execute(query2, [location, species])
+    cursor.execute(query2, filters)
 except ps.Error as e:
     print(e)
 

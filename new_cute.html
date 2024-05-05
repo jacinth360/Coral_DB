@@ -251,7 +251,7 @@
             </select>
             <br>
             <input type="hidden" name="table" value="16s">
-            <input type="submit" value="Query 16S Data">
+            <input type="submit" value="Query 16S Data" id="query_16s_data">
         </form>
         <form id="ITS2Form" class="query-form" action="cgi-bin/query_data.py" method="post">
             <h2>Query ITS2 Data</h2>
@@ -271,9 +271,10 @@
             </select>
             <br>
             <input type="hidden" name="table" value="its2">
-            <input type="submit" value="Query ITS2 Data">
+            <input type="submit" value="Query ITS2 Data" id="query_ITS2_data">
         </form>
 
+        <div class="16s_data_table">
         <table>
             <tr>
                 <th>Individual</th>
@@ -332,6 +333,7 @@
                 <td>https://maps.app.goo.gl/USMdHssNPsc8yAZe6</td>
             </tr>
         </table>
+        </div>
 
         <h2>Download Data on display</h2>
         <!-- Download button -->
@@ -456,8 +458,38 @@
                 $(tabId).addClass('active'); // Show the clicked tab content
             });
 
-            // load the data table when enter button interacted with
-            
+            // Handler for "Query 16S data" button click
+            $("#find-miRNAs-button").click(function () {
+                var sequence = $("#query_16s_data").val().trim().toUpperCase();
+
+                // Validate input (you can customize this validation)
+                
+
+                // Clear existing table or error message
+                $(".16s_data_table").empty();
+
+                // Send AJAX request to Python program
+                $.ajax({
+                    url: "https://bioed.bu.edu/cgi-bin/students_24/tfogler/Enter_query_tfogler.py",
+                    method: "POST",
+                    data: {
+                        data: sequence,
+                        selector: "seq"
+                    },
+                    success: function (data) {
+                        if (data.length === 0) {
+                            $(".16s_data_table").text("There were no data matching your filters.");
+                        } else {
+                            // Format data for table (you'll need to adapt this part)
+                            // Display the new table
+                            // Example: displayTable(data);
+                        }
+                    },
+                    error: function () {
+                        alert("Error occurred while fetching data.");
+                    }
+                });
+            });
         });
 
         // JavaScript to handle taxonomy selection
