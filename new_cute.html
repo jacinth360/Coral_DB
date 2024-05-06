@@ -368,11 +368,11 @@
         <h2>Photo</h2>
         <p>Please select the location and species you want to explore and press the query photo data button.</p>
         <!-- Dropdown menus for species and location -->
-        <form id="photoQueryForm" class="query-form" action="cgi-bin/query_photo_data.py" method="post">
+        <form id="Photo_Form" class="query-form" action="cgi-bin/Photo_query_tfogler.py" method="post">
             <h2>Query Photo Data</h2>
             <label for="location_photo">Location:</label>
             <select id="location_photo" name="location_photo">
-                <option value="" selected>Select Location</option>
+                <option value="%" selected>Select Location</option>
                 <option value="Crook">Crook</option>
                 <option value="Reef">Reef</option>
                 <option value="Lagoon">Lagoon</option>
@@ -380,7 +380,7 @@
             <br>
             <label for="species_photo">Species:</label>
             <select id="species_photo" name="species_photo">
-                <option value="" selected>Select Species</option>
+                <option value="%" selected>Select Species</option>
                 <option value="PAST">PAST</option>
                 <option value="SSID">SSID</option>
             </select>
@@ -390,7 +390,7 @@
         </form>
         
         <!-- Section for displaying photos of corals -->
-        <div id="coralPhotos">
+        <div id="coral_photos">
             <img src="/Users/wangmux/Downloads/2018_NativeGE_CrookedCreek_PAST_1 (1).jpg" alt="Example photo">
         </div>
 
@@ -495,6 +495,44 @@
                     }
                 });
             });
+
+            // Handler for "Photo form" form submission
+            $("#Photo_Form").submit(function(e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var location = $("#location_photo").val();
+                var species = $("#species_photo").val();
+
+                // Validate input (you can customize this validation)
+                if (location == "%" && species == "%") {
+                    alert("Your search hit too many photos. Please narrow your search criteria.");
+                    return; // Exit function
+                }
+                
+                // Clear existing table or error message
+                $("#coral_photos").empty();
+
+                // Send AJAX request to Python program
+                $.ajax({
+                    url: "https://bioed.bu.edu/cgi-bin/students_24/Team_9/Photo_query_form.py",
+                    method: "POST",
+                    data: {
+                        location: location,
+                        species: species
+                    },
+                    success: function (data) {
+                        if (data.length === 0) {
+                            $("#coral_photos").text("There were no photos in our database matching your filters.");
+                        } else {
+                            // Display photos
+                            displayPhotos(data);
+                        }
+                    },
+                    error: function () {
+                        alert("Error occurred while fetching data.");
+                    }
+                });
+            });
         });
 
         // Function to process 16S data table
@@ -540,6 +578,24 @@
 
             // Insert the table into the specified resultDiv
             $(".16s_data_table").html(tableHtml);
+        }
+
+        // Function to display photos as queried by Photo Form
+        function displayPhotos(data) {
+            // Parse the JSON data
+            var parsedData = JSON.parse(data);
+
+            var photoHtml = "<table>\n<tr><th>Coral Photos</th></tr>\n<tbody>\n";
+
+            // Iterate through each row in the data
+            parsedData.forEach(function(row) {
+                photoHtml += "<tr><td>" + row[1] + "</td></tr>\n";
+            });
+
+            photoHtml += "</tbody>\n</table>";
+
+            // Insert the table into the specified resultDiv
+            $("#coral_photos").html(photoHtml);
         }
 
         // JavaScript to handle taxonomy selection
