@@ -46,7 +46,7 @@ filters = {'location': location, 'species': species}
 # define query
 # Select photos from observation
 query = """
-SELECT oid, concat("<img src=\\"", Photo, "\\" alt=\\"", Individual, "\\">") as Image
+SELECT concat(oid, ". ", Individual) as Individual, concat("<img src=\\"", Photo, "\\" alt=\\"", Individual, "\\">") as Image
 FROM Observation o join Coral c on o.cid = c.cid
 WHERE Location LIKE %(location)s and Species LIKE %(species)s;
 """

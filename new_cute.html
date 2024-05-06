@@ -589,7 +589,8 @@
 
             // Iterate through each row in the data
             parsedData.forEach(function(row) {
-                photoHtml += "<tr><td>" + row[1] + "</td></tr>\n";
+                // photoHtml += `<tr class="odd"><td>` + row[0] + `</td></tr>\n`;
+                photoHtml += `<tr><td>` + row[1] + `</td></tr>\n`;
             });
 
             photoHtml += "</tbody>\n</table>";
