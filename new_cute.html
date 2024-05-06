@@ -233,11 +233,11 @@
         <h2>Data</h2>
         <p>Only 16S and ITS2 data are available at the moment. Please select the location and species and press the query button. To export the data, press the download data button.</p>
         <!-- Add options for different data views if needed -->
-        <form id="16SForm" class="query-form" action="cgi-bin/query_data.py" method="post">
+        <form id="16S_Form" class="query-form" action="/var/www/cgi-bin/students_24/Team_9/Enter_query_tfogler.py" method="post">
             <h2>Query 16S Data</h2>
             <label for="location_16s">Location:</label>
             <select id="location_16s" name="location_16s">
-                <option value="" selected>Select Location</option>
+                <option value="%" selected>Select Location</option>
                 <option value="Crook">Crook</option>
                 <option value="Reef">Reef</option>
                 <option value="Lagoon">Lagoon</option>
@@ -245,19 +245,19 @@
             <br>
             <label for="species_16s">Species:</label>
             <select id="species_16s" name="species_16s">
-                <option value="" selected>Select Species</option>
+                <option value="%" selected>Select Species</option>
                 <option value="PAST">PAST</option>
                 <option value="SSID">SSID</option>
             </select>
             <br>
-            <input type="hidden" name="table" value="16s">
+            <!-- <input type="hidden" name="table" value="16s"> -->
             <input type="submit" value="Query 16S Data" id="query_16s_data">
         </form>
-        <form id="ITS2Form" class="query-form" action="cgi-bin/Enter_query_tfogler.py" method="post">
+        <form id="ITS2_Form" class="query-form" action="cgi-bin/Enter_query_tfogler.py" method="post">
             <h2>Query ITS2 Data</h2>
             <label for="location_its2">Location:</label>
             <select id="location_its2" name="location_its2">
-                <option value="" selected>Select Location</option>
+                <option value="%" selected>Select Location</option>
                 <option value="Crook">Crook</option>
                 <option value="Reef">Reef</option>
                 <option value="Lagoon">Lagoon</option>
@@ -265,12 +265,12 @@
             <br>
             <label for="species_its2">Species:</label>
             <select id="species_its2" name="species_its2">
-                <option value="" selected>Select Species</option>
+                <option value="%" selected>Select Species</option>
                 <option value="PAST">PAST</option>
                 <option value="SSID">SSID</option>
             </select>
             <br>
-            <input type="hidden" name="table" value="its2">
+            <!-- <input type="hidden" name="table" value="its2"> -->
             <input type="submit" value="Query ITS2 Data" id="query_ITS2_data">
         </form>
 
@@ -458,8 +458,10 @@
                 $(tabId).addClass('active'); // Show the clicked tab content
             });
 
-            // Handler for "Query 16S data" button click
-            $("#find-miRNAs-button").click(function () {
+            // Handler for "Query 16S data" and "Query ITS2 data" form submission
+            $("#16S_Form").submit(function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
                 var location = $("#location_16s").val();
                 var species = $("#species_16s").val();
                 // var sequence = $("#query_16s_data").val().trim().toUpperCase();
@@ -472,7 +474,7 @@
 
                 // Send AJAX request to Python program
                 $.ajax({
-                    url: "https://bioed.bu.edu/cgi-bin/students_24/tfogler/Enter_query_tfogler.py",
+                    url: "https://bioed.bu.edu/cgi-bin/students_24/Team_9/Enter_query_tfogler.py",
                     method: "POST",
                     data: {
                         location: location,
@@ -485,7 +487,7 @@
                             // Format data for table (you'll need to adapt this part)
                             // Display the new table
                             // Example: displayTable(data);
-                            processData(data);
+                            tabulateData(data);
                         }
                     },
                     error: function () {
@@ -496,7 +498,7 @@
         });
 
         // Function to process 16S data table
-        function processData(data) {
+        function tabulateData(data) {
             var tableHtml = `<table>
             <thead>
                 <tr>
@@ -512,13 +514,25 @@
 
             // Parse the JSON data
             const parsedData = JSON.parse(data);
+            var row; // declare
+            var i = 0; // counts odd & even rows
 
             // Iterate through each row in the data
-            parsedData.forEach(function(row) {
-                tableHtml += `
-                <tr>
-                    <td>` + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td><td>" + row[4] + "</td><td>" + row[5] + `</td>
-                </tr>`;
+            parsedData.forEach( function(row) {
+                if (i % 2) {
+                    tableHtml += `
+                    <tr>
+                        <td>` + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td><td>" + row[4] + "</td><td><a href=\"" + row[5] + "\">" + row[5] + `</a></td>
+                    </tr>`;
+                }
+                else {
+                    tableHtml += `
+                    <tr class="odd">
+                        <td>` + row[1] + "</td><td>" + row[2] + "</td><td>" + row[3] + "</td><td>" + row[4] + "</td><td><a href=\"" + row[5] + "\">" + row[5] + `</a></td>
+                    </tr>`;
+                }
+
+                i++;
             });
 
             tableHtml += `  </tbody>
