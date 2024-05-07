@@ -41,10 +41,9 @@ filters = {'location': location, 'species': species}
 
 # Define the SQL query
 query = """
-SELECT AVG(RED) as RED, AVG(GREEN) as GREEN, AVG(BLUE) as BLUE
+SELECT RED, GREEN, BLUE
 FROM Observation o JOIN Coral c ON o.cid = c.cid
-WHERE Location LIKE %(location)s AND Species LIKE %(species)s
-group by color;
+WHERE Location LIKE %(location)s AND Species LIKE %(species)s;
 """
 
 # Execute the query

@@ -422,7 +422,7 @@
         <!-- Section for generating histogram -->
         <div id="histogram">
             <h3>Histogram of RGB Colors</h3>
-            <div id="histogramChart">
+            <div id="barChart">
                 <!-- Google Charts histogram will be displayed here -->
             </div>
             <!-- Download button for exporting histogram as an image -->
@@ -456,56 +456,60 @@
                     success: function(data) {
                         // Parse the JSON data and display the histogram
                         // var chartData = JSON.parse(data);
-                        // drawHistogram(data, location, species);
-                        document.getElementById('histogramChart').innerHTML = (data);
+                        document.getElementById('barChart').innerHTML = (data);
+                        // drawBarChart(data, location, species);
                     },
                     error: function() {
                         alert("Error occurred while fetching color data.");
                     }
                 });
             });
-        
-            // Function to draw histogram using Google Charts
-            function drawHistogram(data, location, species) {
-                var rgbValues = JSON.parse(data);
+        });
 
-                google.charts.load('current', { packages: ['corechart'] });
-                google.charts.setOnLoadCallback(function() {
-                   var data = google.visualization.arrayToDataTable([
-                        ['Color', 'Value'],
-                        ['Red', rgbValues[0]],
-                        ['Green', rgbValues[1]],
-                        ['Blue', rgbValues[2]]
-                    ]);
+        // Load the Google Charts package
+        google.charts.load('current', { packages: ['corechart'] });
 
-                var options = {
-                    title: 'Histogram of RGB Colors',
-                    legend: { position: 'none' },
-                    colors: ['red', 'green', 'blue'], // Set colors for RGB bars
-                    hAxis: { title: 'Location: ' + location + ', Species: ' + species }, // X-axis label
-                    vAxis: { title: 'Color Value' } // Y-axis label
-                };
-
-                var chart = new google.visualization.ColumnChart(document.getElementById('histogramChart'));
-                chart.draw(data, options);
-                });
+        // Function to draw the bar chart
+        function drawBarChart(values, location, species) {
+            // List of values
+            rgbValues = JSON.parse(values);
+            
+            // Parse the list of values into RGB tuples
+            const rgbData = [];
+            for (let i = 0; i < rgbValues.length; i += 3) {
+                const red = rgbValues[i];
+                const green = rgbValues[i + 1];
+                const blue = rgbValues[i + 2];
+                rgbData.push([`Color Set ${Math.floor(i / 3) + 1}`, red, green, blue]);
             }
 
-    
-            // Function to handle exporting histogram as an image
-            $("#exportHistogram").click(function() {
-                var chart = document.getElementById('histogramChart');
-                var imgUri = chart.getElementsByTagName('img')[0].src;
-    
-                // Trigger download of the histogram image
-                var link = document.createElement('a');
-                link.href = imgUri;
-                link.download = 'histogram.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-        });
+            // Create a data table and add the data
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Color Set');
+            data.addColumn('number', 'Red');
+            data.addColumn('number', 'Green');
+            data.addColumn('number', 'Blue');
+            data.addRows(rgbData);
+
+            // Define chart options
+            const options = {
+                title: 'RGB Colors at ' + location + ' ' + species,
+                hAxis: { title: 'Color Sets' },
+                vAxis: { title: 'Color Value' },
+                series: {
+                    0: { color: 'red' },
+                    1: { color: 'green' },
+                    2: { color: 'blue' }
+                }
+            };
+
+            // Create and draw the bar chart
+            const chart = new google.visualization.ColumnChart(document.getElementById('barChart'));
+            chart.draw(data, options);
+        }
+
+        // Call the drawBarChart function once Google Charts is loaded
+        google.charts.setOnLoadCallback(drawBarChart);
     </script>
     
 
