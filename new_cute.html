@@ -397,14 +397,13 @@
         <h2>Colors</h2>
         <p>Please select the location and species you want to explore and press the query color data button.</p>
         <!-- Dropdown menus for species and location -->
-        <form id="colorQueryForm" class="query-form" action="cgi-bin/query_color_data.py" method="post">
+        <form id="colorQueryForm" class="query-form" action="https://bioed.bu.edu/cgi-bin/students_24/Team_9/query_color_data.py" method="post">
             <h2>Query Color Data</h2>
             <label for="location_color">Location:</label>
             <select id="location_color" name="location_color">
                 <option value="%" selected>Select Location</option>
                 <option value="Crook">Crook</option>
                 <option value="Reef">Reef</option>
-                <option value="Lagoon">Lagoon</option>
             </select>
             <br>
             <label for="species_color">Species:</label>
@@ -422,7 +421,7 @@
         <!-- Section for generating histogram -->
         <div id="histogram">
             <h3>Histogram of RGB Colors</h3>
-            <div id="barChart">
+            <div id="histogramChart">
                 <!-- Google Charts histogram will be displayed here -->
             </div>
             <!-- Download button for exporting histogram as an image -->
@@ -430,87 +429,45 @@
         </div>
     </div>
     
-    <script>
-        // JavaScript code for handling color query form submission
-        $(document).ready(function() {
-            $("#colorQueryForm").submit(function(e) {
-                e.preventDefault(); // Prevent the default form submission
-    
-                var location = $("#location_color").val();
-                var species = $("#species_color").val();
-    
-                // // Validate input (you can customize this validation)
-                // if (location == "" || species == "") {
-                //     alert("Please select both location and species.");
-                //     return;
-                // }
-    
-                // Send AJAX request to Python program
-                $.ajax({
-                    url: "https://bioed.bu.edu/cgi-bin/students_24/Team_9/query_color_data.py",
-                    method: "POST",
-                    data: {
-                        location_color: location,
-                        species_color: species
-                    },
-                    success: function(data) {
-                        // Parse the JSON data and display the histogram
-                        // var chartData = JSON.parse(data);
-                        document.getElementById('barChart').innerHTML = (data);
-                        // drawBarChart(data, location, species);
-                    },
-                    error: function() {
-                        alert("Error occurred while fetching color data.");
-                    }
-                });
-            });
-        });
+<script>
+    google.charts.load('current', {'packages':['corechart']});
 
-        // Load the Google Charts package
-        google.charts.load('current', { packages: ['corechart'] });
+    function drawHistogram(averageValues) {
+        var data = google.visualization.arrayToDataTable([
+            ['Color', 'Value'],
+            ['Red', averageValues.average_red],
+            ['Green', averageValues.average_green],
+            ['Blue', averageValues.average_blue]
+        ]);
 
-        // Function to draw the bar chart
-        function drawBarChart(values, location, species) {
-            // List of values
-            rgbValues = JSON.parse(values);
-            
-            // Parse the list of values into RGB tuples
-            const rgbData = [];
-            for (let i = 0; i < rgbValues.length; i += 3) {
-                const red = rgbValues[i];
-                const green = rgbValues[i + 1];
-                const blue = rgbValues[i + 2];
-                rgbData.push([`Color Set ${Math.floor(i / 3) + 1}`, red, green, blue]);
-            }
+        var options = {
+            title: 'RGB Color Distribution',
+            legend: { position: 'none' },
+            colors: ['#FF0000', '#00FF00', '#0000FF']
+        };
 
-            // Create a data table and add the data
-            const data = new google.visualization.DataTable();
-            data.addColumn('string', 'Color Set');
-            data.addColumn('number', 'Red');
-            data.addColumn('number', 'Green');
-            data.addColumn('number', 'Blue');
-            data.addRows(rgbData);
+        var chart = new google.visualization.ColumnChart(document.getElementById('histogramChart'));
+        chart.draw(data, options);
+    }
 
-            // Define chart options
-            const options = {
-                title: 'RGB Colors at ' + location + ' ' + species,
-                hAxis: { title: 'Color Sets' },
-                vAxis: { title: 'Color Value' },
-                series: {
-                    0: { color: 'red' },
-                    1: { color: 'green' },
-                    2: { color: 'blue' }
-                }
-            };
+    document.getElementById('colorQueryForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var form = event.target;
+        var formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: form.method,
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Draw histogram using the received data
+            drawHistogram(data);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
 
-            // Create and draw the bar chart
-            const chart = new google.visualization.ColumnChart(document.getElementById('barChart'));
-            chart.draw(data, options);
-        }
-
-        // Call the drawBarChart function once Google Charts is loaded
-        google.charts.setOnLoadCallback(drawBarChart);
-    </script>
     
 
     <div id="help" class="tabcontent">
@@ -692,3 +649,5 @@
     </script>
 </body>
 </html>
+
+

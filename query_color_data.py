@@ -43,7 +43,7 @@ filters = {'location': location, 'species': species}
 query = """
 SELECT RED, GREEN, BLUE
 FROM Observation o JOIN Coral c ON o.cid = c.cid
-WHERE Location LIKE %(location)s AND Species LIKE %(species)s;
+WHERE Location LIKE %(location)s AND Species LIKE %(species)s
 """
 
 # Execute the query
@@ -54,9 +54,29 @@ except ps.Error as e:
 
 # Fetch the results
 results = cursor.fetchall()
-print(json.dumps(results))
+
+# Calculate the sum of RED, GREEN, and BLUE
+total_red = sum(row[0] for row in results)
+total_green = sum(row[1] for row in results)
+total_blue = sum(row[2] for row in results)
+
+# Count the number of rows fetched
+num_rows = len(results)
+
+# Calculate the average values
+average_red = total_red / num_rows
+average_green = total_green / num_rows
+average_blue = total_blue / num_rows
+
+# Construct a dictionary with the average values
+average_values = {'average_red': average_red, 'average_green': average_green, 'average_blue': average_blue}
+
+# Print the JSON-formatted average values
+print(json.dumps(average_values))
+
 
 # Close cursor and connection
 cursor.close()
 connection.close()
+
 
