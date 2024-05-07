@@ -429,44 +429,78 @@
         </div>
     </div>
     
-<script>
-    google.charts.load('current', {'packages':['corechart']});
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+    
+        function drawHistogram(averageValues) {
+            var data = google.visualization.arrayToDataTable([
+                ['Color', 'Value', { role: 'style' }],
+                ['Red', averageValues.average_red, '#FF0000'],
+                ['Green', averageValues.average_green, '#00FF00'],
+                ['Blue', averageValues.average_blue, '#0000FF']
+            ]);
+    
+            var options = {
+                title: 'RGB Color Distribution',
+                legend: { position: 'none' },
+                bar: { groupWidth: '70%' }, // Adjust bar width
+                colors: ['#FF0000', '#00FF00', '#0000FF']
+            };
+    
+            var chart = new google.visualization.ColumnChart(document.getElementById('histogramChart'));
+            chart.draw(data, options);
+        }
+    
+        function exportHistogram() {
+            var chart = document.getElementById('histogramChart');
+            var chartSvg = chart.getElementsByTagName('svg')[0].outerHTML;
+            
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+    
+            canvas.width = chart.offsetWidth;
+            canvas.height = chart.offsetHeight;
+    
+            var image = new Image();
+            image.src = 'data:image/svg+xml;base64,' + window.btoa(chartSvg);
+    
+            image.onload = function() {
+                ctx.drawImage(image, 0, 0);
+                var url = canvas.toDataURL('image/png');
+    
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'histogram.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+        }
+    
+        document.getElementById('colorQueryForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var form = event.target;
+            var formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Draw histogram using the received data
+                drawHistogram(data);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    
+        document.getElementById('exportHistogram').addEventListener('click', function() {
+            exportHistogram();
+        });
+    </script>
+    
+    
 
-    function drawHistogram(averageValues) {
-        var data = google.visualization.arrayToDataTable([
-            ['Color', 'Value'],
-            ['Red', averageValues.average_red],
-            ['Green', averageValues.average_green],
-            ['Blue', averageValues.average_blue]
-        ]);
-
-        var options = {
-            title: 'RGB Color Distribution',
-            legend: { position: 'none' },
-            colors: ['#FF0000', '#00FF00', '#0000FF']
-        };
-
-        var chart = new google.visualization.ColumnChart(document.getElementById('histogramChart'));
-        chart.draw(data, options);
-    }
-
-    document.getElementById('colorQueryForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        var form = event.target;
-        var formData = new FormData(form);
-        
-        fetch(form.action, {
-            method: form.method,
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Draw histogram using the received data
-            drawHistogram(data);
-        })
-        .catch(error => console.error('Error:', error));
-    });
-</script>
 
     
 
