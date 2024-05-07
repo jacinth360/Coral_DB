@@ -493,7 +493,7 @@
                             // Format data for table (you'll need to adapt this part)
                             // Display the new table
                             // Example: displayTable(data);
-                            sessionStorage.setItem("16sData", JSON.stringify(data));
+                            sessionStorage.setItem("16sData", data);
                             tabulateData(data);
                         }
                     },
@@ -514,21 +514,21 @@
 
                 var text = $("#download_data_text");
                 text.html(variableContent);
-                // // Create a Blob containing the variable content
-                // const blob = new Blob([variableContent], { type: 'text/plain;charset=utf-8' });
+                // Create a Blob containing the variable content
+                const blob = new Blob([variableContent], { type: 'text/plain;charset=utf-8' });
 
-                // // Create an anchor element
-                // const anchor = document.createElement('a');
-                // anchor.href = URL.createObjectURL(blob);
-                // anchor.target = '_blank';
-                // anchor.download = fileName;
+                // Create an anchor element
+                const anchor = document.createElement('a');
+                anchor.href = URL.createObjectURL(blob);
+                anchor.target = '_blank';
+                anchor.download = fileName;
 
-                // // Trigger the download by simulating a click event
-                // anchor.click();
+                // Trigger the download by simulating a click event
+                anchor.click();
 
-                // // Clean up by revoking the object URL and removing the anchor
-                // URL.revokeObjectURL(anchor.href);
-                // document.body.removeChild(anchor);
+                // Clean up by revoking the object URL and removing the anchor
+                URL.revokeObjectURL(anchor.href);
+                document.body.removeChild(anchor);
             });
 
             // Handler for "Photo form" form submission
@@ -619,9 +619,11 @@
         function convertJSONToCSV(json, keys) {
             const parsedJSON = JSON.parse(json);
 
-            var csv = keys + '\\n' + parsedJSON.map(function(row) {
+            alert(typeof parsedJSON);
+
+            var csv = keys + '\n' + parsedJSON.map(function(row) {
                 return row.join();
-            }).join('\\n');
+            }).join('\n');
 
             return csv;
         }
