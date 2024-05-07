@@ -18,7 +18,6 @@
         /* CSS for tabs */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url('/Users/wangmux/Desktop/Untitled Project (1).jpg');
             background-size: cover;
             background-color: #0b4a6a; /* Slightly darker shade of blue for underwater feel */
             color: #2109a8; /* Light gray text color */
@@ -118,11 +117,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-        }
-
-        /*  Style for ITS2 selection  */
-        #ITS2_Form {
-            display: none;
         }
 
         /* Style for metadata selection */
@@ -256,7 +250,7 @@
             </select>
             <br>
             <!-- <input type="hidden" name="table" value="16s"> -->
-            <input type="submit" value="Submit" id="query_16s_data">
+            <input type="submit" value="Query 16S Data" id="query_16s_data">
         </form>
         <form id="ITS2_Form" class="query-form" action="cgi-bin/Enter_query_tfogler.py" method="post">
             <h2>Query ITS2 Data</h2>
@@ -343,7 +337,6 @@
         <h2>Download Data on display</h2>
         <!-- Download button -->
         <button id="downloadData">Download Data</button>
-        <p id="download_data_text"></p>
     </div>
 
     <div id="metadata" class="tabcontent">
@@ -354,19 +347,18 @@
         <!-- Taxonomy selection menu -->
         <label for="taxonomySelect">Select Taxonomy Level:</label>
         <select id="taxonomySelect">
-            <!-- <option value="">Select Taxonomy Level</option> -->
+            <option value="">Select Taxonomy Level</option>
             <option value="Kingdom">Kingdom</option>
             <option value="Phylum">Phylum</option>
-            <option value="Class" selected>Class</option>
+            <option value="Class">Class</option>
             <option value="Order">Order</option>
             <option value="Family">Family</option>
             <option value="Genus">Genus</option>
             <option value="Species">Species</option>
         </select>
 
-        <!-- Stacked Bar chart for selected taxonomy level -->
+        <!-- Placeholder for displaying selected taxonomy value -->
         <div id="selectedTaxonomy">
-            <img src="https://bioed.bu.edu/images/students_24/Team_9/Metagenome_placeholder.jpg" alt="Example Taxonomy">
         </div>
     </div>
 
@@ -409,7 +401,7 @@
             <h2>Query Color Data</h2>
             <label for="location_color">Location:</label>
             <select id="location_color" name="location_color">
-                <option value="" selected>Select Location</option>
+                <option value="%" selected>Select Location</option>
                 <option value="Crook">Crook</option>
                 <option value="Reef">Reef</option>
                 <option value="Lagoon">Lagoon</option>
@@ -417,7 +409,7 @@
             <br>
             <label for="species_color">Species:</label>
             <select id="species_color" name="species_color">
-                <option value="" selected>Select Species</option>
+                <option value="%" selected>Select Species</option>
                 <option value="PAST">PAST</option>
                 <option value="SSID">SSID</option>
             </select>
@@ -425,6 +417,8 @@
             <input type="hidden" name="table" value="color">
             <input type="submit" value="Query Color Data">
         </form>
+        <div id="coralColors">
+        </div>
         <!-- Section for generating histogram -->
         <div id="histogram">
             <h3>Histogram of RGB Colors</h3>
@@ -435,6 +429,85 @@
             <button id="exportHistogram">Export Histogram</button>
         </div>
     </div>
+    
+    <script>
+        // JavaScript code for handling color query form submission
+        $(document).ready(function() {
+            $("#colorQueryForm").submit(function(e) {
+                e.preventDefault(); // Prevent the default form submission
+    
+                var location = $("#location_color").val();
+                var species = $("#species_color").val();
+    
+                // // Validate input (you can customize this validation)
+                // if (location == "" || species == "") {
+                //     alert("Please select both location and species.");
+                //     return;
+                // }
+    
+                // Send AJAX request to Python program
+                $.ajax({
+                    url: "https://bioed.bu.edu/cgi-bin/students_24/Team_9/query_color_data.py",
+                    method: "POST",
+                    data: {
+                        location_color: location,
+                        species_color: species
+                    },
+                    success: function(data) {
+                        // Parse the JSON data and display the histogram
+                        // var chartData = JSON.parse(data);
+                        // drawHistogram(data, location, species);
+                        document.getElementById('histogramChart').innerHTML = (data);
+                    },
+                    error: function() {
+                        alert("Error occurred while fetching color data.");
+                    }
+                });
+            });
+        
+            // Function to draw histogram using Google Charts
+            function drawHistogram(data, location, species) {
+                var rgbValues = JSON.parse(data);
+
+                google.charts.load('current', { packages: ['corechart'] });
+                google.charts.setOnLoadCallback(function() {
+                   var data = google.visualization.arrayToDataTable([
+                        ['Color', 'Value'],
+                        ['Red', rgbValues[0]],
+                        ['Green', rgbValues[1]],
+                        ['Blue', rgbValues[2]]
+                    ]);
+
+                var options = {
+                    title: 'Histogram of RGB Colors',
+                    legend: { position: 'none' },
+                    colors: ['red', 'green', 'blue'], // Set colors for RGB bars
+                    hAxis: { title: 'Location: ' + location + ', Species: ' + species }, // X-axis label
+                    vAxis: { title: 'Color Value' } // Y-axis label
+                };
+
+                var chart = new google.visualization.ColumnChart(document.getElementById('histogramChart'));
+                chart.draw(data, options);
+                });
+            }
+
+    
+            // Function to handle exporting histogram as an image
+            $("#exportHistogram").click(function() {
+                var chart = document.getElementById('histogramChart');
+                var imgUri = chart.getElementsByTagName('img')[0].src;
+    
+                // Trigger download of the histogram image
+                var link = document.createElement('a');
+                link.href = imgUri;
+                link.download = 'histogram.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
+    </script>
+    
 
     <div id="help" class="tabcontent">
         <h2>Help</h2>
@@ -449,67 +522,6 @@
          <p> After selecting species and location and pressing the "query color" button, a histogram of RGB values would appear for analysis. You can also download this into an image by pressing "Export Histogram" button.</p>
        
     </div>
-    <script>
-    // JavaScript code for handling color query form submission
-    $(document).ready(function() {
-        $("#colorQueryForm").submit(function(e) {
-            e.preventDefault(); // Prevent the default form submission
-            var location = $("#location_color").val();
-            var species = $("#species_color").val();
-            // Validate input (you can customize this validation)
-            if (location == "" || species == "") {
-                alert("Please select both location and species.");
-                return;
-            }
-            // Send AJAX request to Python program
-            $.ajax({
-                url: "cgi-bin/query_color_data.py",
-                method: "POST",
-                data: {
-                    location: location,
-                    species: species
-                },
-                success: function(data) {
-                    // Parse the JSON data and display the histogram
-                    var chartData = JSON.parse(data);
-                    drawHistogram(chartData, location, species);
-                },
-                error: function() {
-                    alert("Error occurred while fetching color data.");
-                }
-            });
-        });
-        // Function to draw histogram using Google Charts
-        function drawHistogram(chartData, location, species) {
-            google.charts.load('current', { packages: ['corechart'] });
-            google.charts.setOnLoadCallback(function() {
-                var data = google.visualization.arrayToDataTable(chartData);
-                var options = {
-                    title: 'Histogram of RGB Colors',
-                    legend: { position: 'none' },
-                    histogram: { bucketSize: 1 },
-                    colors: ['red', 'green', 'blue'], // Set colors for RGB bars
-                    hAxis: { title: 'Location: ' + location + ', Species: ' + species }, // X-axis label
-                    vAxis: { title: 'Color Channel Value' } // Y-axis label
-                };
-                var chart = new google.visualization.Histogram(document.getElementById('histogramChart'));
-                chart.draw(data, options);
-            });
-        }
-        // Function to handle exporting histogram as an image
-        $("#exportHistogram").click(function() {
-            var chart = document.getElementById('histogramChart');
-            var imgUri = chart.getElementsByTagName('img')[0].src;
-            // Trigger download of the histogram image
-            var link = document.createElement('a');
-            link.href = imgUri;
-            link.download = 'histogram.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-    });
-    </script>
 
     <script>
         $(document).ready(function(){
@@ -550,7 +562,6 @@
                             // Format data for table (you'll need to adapt this part)
                             // Display the new table
                             // Example: displayTable(data);
-                            sessionStorage.setItem("16sData", data);
                             tabulateData(data);
                         }
                     },
@@ -558,38 +569,6 @@
                         alert("Error occurred while fetching data.");
                     }
                 });
-            });
-
-            // Download data button
-            $("#downloadData").click( function () {
-                var variableContent = sessionStorage.getItem("16sData");
-                const fileName = '16s_data_table.csv';
-                const keys = "cid, Individual, location, species, color, mapslink";
-
-                // Check that stored data exists
-                if (variableContent === null) {
-                    alert("Not found: " + fileName + ". Please select options and click the Submit button.");
-                    return;
-                }
-                
-                // Convert data into csv format
-                variableContent = convertJSONToCSV(variableContent, keys);
-
-                // Create a Blob containing the variable content
-                const blob = new Blob([variableContent], { type: 'text/plain;charset=utf-8' });
-
-                // Create an anchor element
-                const anchor = document.createElement('a');
-                anchor.href = URL.createObjectURL(blob);
-                anchor.target = '_blank';
-                anchor.download = fileName;
-
-                // Trigger the download by simulating a click event
-                anchor.click();
-
-                // Clean up by revoking the object URL and removing the anchor
-                URL.revokeObjectURL(anchor.href);
-                document.body.removeChild(anchor);
             });
 
             // Handler for "Photo form" form submission
@@ -674,19 +653,6 @@
 
             // Insert the table into the specified resultDiv
             $(".16s_data_table").html(tableHtml);
-        }
-
-        // Function to prepare CSV file for download when Download Data button pressed
-        function convertJSONToCSV(json, keys) {
-            const parsedJSON = JSON.parse(json);
-
-            // alert(typeof parsedJSON);
-
-            var csv = keys + '\n' + parsedJSON.map(function(row) {
-                return row.join();
-            }).join('\n');
-
-            return csv;
         }
 
         // Function to display photos as queried by Photo Form
