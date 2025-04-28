@@ -14,3 +14,18 @@ The database supports longitudinal studies investigating coral adaptation, bleac
 ## Purpose
 
 **CoralDB** enables marine biologists and conservation scientists to efficiently track coral population dynamics, health metrics, and ecological shifts over time.
+
+##
+**Just the relation table and some tabs displayed**
+
+## Relationship Tables
+![relations](https://github.com/jacinth360/Coral_DB/blob/main/table_relations.jpg)
+
+## Home Tab
+![Home Tab](https://github.com/jacinth360/Coral_DB/blob/main/home.png)
+
+## Data Tab
+![Data Tab](https://github.com/jacinth360/Coral_DB/blob/main/data_tab.png)
+
+## Photo Tab
+![Data Tab](https://github.com/jacinth360/Coral_DB/blob/main/photo%20tab.png)
