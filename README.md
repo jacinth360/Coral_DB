@@ -28,4 +28,4 @@ The database supports longitudinal studies investigating coral adaptation, bleac
 ![Data Tab](https://github.com/jacinth360/Coral_DB/blob/main/data_tab.png)
 
 ## Photo Tab
-![Data Tab](https://github.com/jacinth360/Coral_DB/blob/main/photo%20tab.png)
+![Photo Tab](https://github.com/jacinth360/Coral_DB/blob/main/photo%20tab.png)
