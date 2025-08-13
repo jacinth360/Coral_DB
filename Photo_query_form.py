@@ -9,10 +9,10 @@ cgitb.enable()
 import json
 
 # get username from command line
-username = 'tfogler'
+username = 'usr'
 
 # get password interactively
-pswd = 'beirut!renegade6'
+pswd = 'pswd'
 
 #connect python to mysql
 try:
